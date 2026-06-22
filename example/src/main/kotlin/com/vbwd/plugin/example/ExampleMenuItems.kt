@@ -9,13 +9,14 @@ import com.vbwd.core.plugins.registries.MenuItem
 object ExampleMenuItems {
     private const val ORDER = 50
 
-    fun all(): List<MenuItem> = listOf(
-        MenuItem(
-            id = "example",
-            icon = "star",
-            title = "Example",
-            routePath = "/example",
-            order = ORDER,
-        ),
-    )
+    fun all(): List<MenuItem> =
+        listOf(
+            MenuItem(
+                id = "example",
+                icon = "star",
+                title = "Example",
+                routePath = "/example",
+                order = ORDER,
+            ),
+        )
 }

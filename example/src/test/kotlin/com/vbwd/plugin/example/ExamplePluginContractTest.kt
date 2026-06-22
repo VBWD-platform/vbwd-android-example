@@ -30,7 +30,11 @@ class ExamplePluginContractTest {
         ): T = EmptyResponse() as T
 
         override fun setToken(token: String?) = Unit
-        override fun on(event: ApiEvent, handler: () -> Unit) = Unit
+
+        override fun on(
+            event: ApiEvent,
+            handler: () -> Unit,
+        ) = Unit
     }
 
     private fun sdk(): DefaultPlatformSdk {
@@ -39,46 +43,50 @@ class ExamplePluginContractTest {
     }
 
     @Test
-    fun `install registers routes, components, store, translations and menu`() = runTest {
-        val platform = sdk()
-        ExamplePlugin().install(platform)
+    fun `install registers routes, components, store, translations and menu`() =
+        runTest {
+            val platform = sdk()
+            ExamplePlugin().install(platform)
 
-        assertEquals(setOf("/example", "/example/secret"), platform.getRoutes().map { it.path }.toSet())
-        assertTrue(platform.getComponents().keys.containsAll(setOf("DashboardExample", "ProfileExample")))
-        assertTrue(platform.getStores().containsKey("exampleStore"))
-        assertEquals("Example", platform.getTranslations()["en"]?.get("example.title"))
-        assertEquals("Beispiel", platform.getTranslations()["de"]?.get("example.title"))
-        assertEquals(listOf("example"), platform.getMenuItems().map { it.id })
-    }
-
-    @Test
-    fun `the auth-login subscription updates the store and is released on uninstall`() = runTest {
-        val platform = sdk()
-        val plugin = ExamplePlugin()
-        plugin.install(platform)
-        assertEquals(1, platform.events.listenerCount(AppEvents.AUTH_LOGIN))
-
-        platform.events.emit(AppEvents.AUTH_LOGIN)
-        assertTrue(plugin.store.sawLogin.value)
-
-        plugin.uninstall()
-        assertEquals(0, platform.events.listenerCount(AppEvents.AUTH_LOGIN))
-    }
+            assertEquals(setOf("/example", "/example/secret"), platform.getRoutes().map { it.path }.toSet())
+            assertTrue(platform.getComponents().keys.containsAll(setOf("DashboardExample", "ProfileExample")))
+            assertTrue(platform.getStores().containsKey("exampleStore"))
+            assertEquals("Example", platform.getTranslations()["en"]?.get("example.title"))
+            assertEquals("Beispiel", platform.getTranslations()["de"]?.get("example.title"))
+            assertEquals(listOf("example"), platform.getMenuItems().map { it.id })
+        }
 
     @Test
-    fun `widget and section names satisfy the discovery conventions`() = runTest {
-        val platform = sdk()
-        ExamplePlugin().install(platform)
-        assertTrue(platform.components.dashboardComponents().map { it.first }.contains("DashboardExample"))
-        assertTrue(platform.components.profileComponents().map { it.first }.contains("ProfileExample"))
-    }
+    fun `the auth-login subscription updates the store and is released on uninstall`() =
+        runTest {
+            val platform = sdk()
+            val plugin = ExamplePlugin()
+            plugin.install(platform)
+            assertEquals(1, platform.events.listenerCount(AppEvents.AUTH_LOGIN))
+
+            platform.events.emit(AppEvents.AUTH_LOGIN)
+            assertTrue(plugin.store.sawLogin.value)
+
+            plugin.uninstall()
+            assertEquals(0, platform.events.listenerCount(AppEvents.AUTH_LOGIN))
+        }
 
     @Test
-    fun `activate and deactivate toggle the store active flag`() = runTest {
-        val plugin = ExamplePlugin()
-        plugin.activate()
-        assertTrue(plugin.store.active.value)
-        plugin.deactivate()
-        assertTrue(!plugin.store.active.value)
-    }
+    fun `widget and section names satisfy the discovery conventions`() =
+        runTest {
+            val platform = sdk()
+            ExamplePlugin().install(platform)
+            assertTrue(platform.components.dashboardComponents().map { it.first }.contains("DashboardExample"))
+            assertTrue(platform.components.profileComponents().map { it.first }.contains("ProfileExample"))
+        }
+
+    @Test
+    fun `activate and deactivate toggle the store active flag`() =
+        runTest {
+            val plugin = ExamplePlugin()
+            plugin.activate()
+            assertTrue(plugin.store.active.value)
+            plugin.deactivate()
+            assertTrue(!plugin.store.active.value)
+        }
 }

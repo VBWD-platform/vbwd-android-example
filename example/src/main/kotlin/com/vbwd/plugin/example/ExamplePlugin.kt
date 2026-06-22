@@ -31,14 +31,15 @@ class ExamplePlugin : Plugin {
     val store = ExampleStore()
     private var unsubscribe: Unsubscribe? = null
 
-    override val metadata = PluginMetadata(
-        name = "example",
-        version = SemanticVersion(1, 0, 0),
-        description = "Reference plugin exercising every PlatformSdk seam.",
-        author = "VBWD",
-        keywords = listOf("example", "reference"),
-        translations = mapOf("en" to mapOf("example.title" to "Example")),
-    )
+    override val metadata =
+        PluginMetadata(
+            name = "example",
+            version = SemanticVersion(1, 0, 0),
+            description = "Reference plugin exercising every PlatformSdk seam.",
+            author = "VBWD",
+            keywords = listOf("example", "reference"),
+            translations = mapOf("en" to mapOf("example.title" to "Example")),
+        )
 
     override suspend fun install(sdk: PlatformSdk) {
         // Routes

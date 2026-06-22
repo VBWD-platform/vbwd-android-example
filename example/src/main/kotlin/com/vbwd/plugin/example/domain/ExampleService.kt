@@ -3,6 +3,8 @@ package com.vbwd.plugin.example.domain
 import com.vbwd.core.networking.ApiClient
 import com.vbwd.core.networking.EmptyResponse
 import com.vbwd.core.networking.get
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 /**
  * Abstraction for the Example plugin's backend interactions (DIP). Depends on
@@ -18,17 +20,15 @@ interface ExampleService {
 class DefaultExampleService(private val api: ApiClient) : ExampleService {
     /**
      * Reads tariff plans — demonstrates a plugin making an API call through the
-     * SDK's shared client. Returns whether the backend responded.
+     * SDK's shared client. Returns whether the backend responded. Best-effort:
+     * any failure is reported as "no response" (cancellation still propagates).
      */
-    // Broad catch is intentional: this is a best-effort probe; any failure is
-    // reported as "no response" (cancellation re-thrown).
-    @Suppress("TooGenericExceptionCaught")
     override suspend fun fetchPlans(): Boolean =
-        try {
+        runCatching {
             api.get<EmptyResponse>("/tarif-plans/")
             true
-        } catch (error: Exception) {
-            if (error is kotlinx.coroutines.CancellationException) throw error
+        }.getOrElse {
+            currentCoroutineContext().ensureActive()
             false
         }
 }
